@@ -1821,25 +1821,27 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
 
 <script>
-// ===== Embedded CV PDFs (base64, self-contained & offline) =====
+// ===== CV download (fetch PDF by path, reliable cross-origin-safe) =====
 function downloadCV(lang, ev){
   if(ev && ev.preventDefault) ev.preventDefault();
-  var map = { en:'pdf/cv_0.pdf', zh:'pdf/cv_1.pdf' };
-  var m = map[lang]; if(!m) return;
-  try {
-    var bin = atob(m[1]), n = bin.length, u8 = new Uint8Array(n);
-    for (var i=0;i<n;i++) u8[i] = bin.charCodeAt(i);
-    var blob = new Blob([u8], {type:'application/pdf'});
+  var map = { en:{path:'pdf/cv_0.pdf', name:'Shuhan_Teng_CV_EN.pdf'},
+              zh:{path:'pdf/cv_1.pdf', name:'Shuhan_Teng_CV_CN.pdf'} };
+  var item = map[lang]; if(!item) return;
+  fetch(item.path).then(function(r){
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    return r.blob();
+  }).then(function(blob){
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
-    a.href = url; a.download = m[0];
+    a.href = url; a.download = item.name;
     document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
-  } catch(e) {
-    var a2 = document.createElement('a');
-    a2.href = 'data:application/pdf;base64,' + m[1]; a2.download = m[0];
-    document.body.appendChild(a2); a2.click(); a2.remove();
-  }
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  }).catch(function(err){
+    // 兜底：直接跳转，交由浏览器处理下载
+    var a = document.createElement('a');
+    a.href = item.path; a.download = item.name;
+    document.body.appendChild(a); a.click(); a.remove();
+  });
 }
 </script>
 
