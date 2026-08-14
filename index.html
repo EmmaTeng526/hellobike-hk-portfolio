@@ -1717,14 +1717,6 @@ document.querySelectorAll('.exp-visual').forEach(visual => {
     if (img.naturalWidth > 0) openLightbox(img.src);
   });
 });
-document.querySelectorAll('.vid-card').forEach(card => {
-  const url = card.getAttribute('href') || card.getAttribute('data-url');
-  card.addEventListener('click', (e) => {
-    if (url && !e.defaultPrevented) {
-      try { window.open(url, '_blank'); } catch (err) { window.location.href = url; }
-    }
-  });
-});
 
 // ===== Scroll Reveal =====
 const revealEls = document.querySelectorAll('.reveal');
